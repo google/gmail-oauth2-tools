@@ -6,18 +6,18 @@
 
 You can [http://google-mail-oauth2-tools.googlecode.com/svn/trunk/python/oauth2.py download] `oauth2.py` from the source repository on the web, or [http://code.google.com/p/google-mail-oauth2-tools/source/checkout checkout] the repository with SVN. You will also need to have Python version 2.4 or greater installed on your system; it can be downloaded from the [http://python.org/download/ python.org download site].
 
-Throughout the tutorial we'll use the hypothetical user `xoauth@gmail.com`. During testing you should substitute your own Gmail or Google Mail email address, and in production this would be the Google email address of your users.
+Throughout the tutorial we'll use the hypothetical user `xoauth@gmail.com`. During testing you should substitute your own Gmail address, and in production this would be the Gmail address of your users.
 
 == Registering An Application ==
 
 To use OAuth2, you must have registered your application through the
 [https://code.google.com/apis/console Google APIs Console]. Registration is explained in [https://developers.google.com/accounts/docs/OAuth2 Using OAuth 2.0 to Access Google APIs].
 
-After registering your application, go to the "API Access" tab and create a Client ID.  oauth2.py is designed to work with the "Installed application" application type. After creating a Client ID, the API Access tab should show a Client ID and Client secret. You will need to supply these values to oauth2.py in the next step.
+After registering your application, go to the "API Access" tab and create a Client ID.  `oauth2.py` is designed to work with the "Installed application" application type. After creating a Client ID, the API Access tab should show a Client ID and Client secret. You will need to supply these values to `oauth2.py` in the next step.
 
 == Creating and Authorizing an OAuth Token ==
 
-Use oauth2.py to create and authorize an OAuth token.
+Use `oauth2.py` to create and authorize an OAuth token.
 
 {{{
 $ python oauth2.py --generate_oauth2_token --client_id=364545978226.apps.googleusercontent.com --client_secret=zNrNsBzOOnQy8_O-8LkofeTR
@@ -28,11 +28,11 @@ Enter verification code:
 
 Visit the URL in your browser, and click the "Allow access" button.
 
-|| [http://google-mail-xoauth-tools.googlecode.com/files/runthrough-access-request.gif] ||
+|| [http://google-mail-oauth2-tools.googlecode.com/files/runthrough-access-request.gif] ||
 
 The next page will provide a verification code.
 
-|| [http://google-mail-xoauth-tools.googlecode.com/files/runthrough-access-grant.gif] ||
+|| [http://google-mail-oauth2-tools.googlecode.com/files/runthrough-access-grant.gif] ||
 
 Copy that code and paste it in the `oauth2.py` script window, and hit `<Enter>`. `oauth2.py` will respond with a refresh token, temporary access token, and the temporary access token expiration time.
 
@@ -47,11 +47,11 @@ Access Token Expiration Seconds: 3600
 $
 }}}
 
-Copy the refresh token and access token somewhere, as you'll want to use them for your testing. The refresh token can be used over and over again until it is revoked. The access token expires in one hour. To view or revoke your OAuth tokens, visit this [https://www.google.com/accounts/IssuedAuthSubTokens Google Accounts page]. You can also generate a new set at any time by repeating the above steps.
+Copy the refresh token and access token somewhere, as you'll want to use them for your testing. The refresh token can be used over and over again until it is revoked. The access token expires in one hour. To view or revoke your OAuth tokens, visit this [https://www.google.com/accounts/IssuedAuthSubTokens Google Accounts page]. You can also generate a new set of tokens at any time by repeating the above steps.
 
 == Generating an OAuth2 Authentication String ==
 
-Next, we can use `oauth2.py` to generate a OAuth2 authentication string using the access token.
+Next, you can use `oauth2.py` to generate a OAuth2 authentication string using the access token.
 
 {{{
 $ python oauth2.py --generate_oauth2_string --access_token=ya29.AHES6ZRKeUQwH2xhirksSUDSyjg9oPuRMMal05Ty0cfFIT_uRfESHw --user=xoauth@gmail.com
@@ -59,7 +59,7 @@ OAuth2 argument:
 dXNlcj14b2F1dGhAZ21haWwuY29tAWF1dGg9QmVhcmVyIHlhMjkuQUhFUzZaUktlVVF3SDJ4aGlya3NTVURTeWpnOW9QdVJNTWFsMDVUeTBjZkZJVF91UmZFU0h3AQE=
 }}}
 
-The base64-encoded string `dXNlcj...` is what you would want to pass to the IMAP AUTHENTICATE command.
+The base64-encoded string `dXNlcj...` is what you would pass to the IMAP AUTHENTICATE command.
 
 == Testing IMAP and SMTP authentication with OAuth2 ==
 
@@ -113,7 +113,7 @@ reply: retcode (235); Msg: 2.7.0 Accepted
 
 == Refreshing the access token ==
 
-Access tokens expire after 1 hour. Typically an application will save the refresh token permanently, and generate new access tokens as needed. `oauth2.py` has the capability to issue a new access token from a valid refresh token.
+Access tokens expire after one hour. Typically an application will save the refresh token permanently, and generate new access tokens as needed. `oauth2.py` can issue a new access token from a valid refresh token.
 
 {{{
 $ python oauth2.py --client_id=364545978226.apps.googleusercontent.com --client_secret=zNrNsBzOOnQy8_O-8LkofeTR --refresh_token=1/q4SaB2JMQB9I-an6F1rxJE9OkOMtfjaz1bPm1tfDpQM
