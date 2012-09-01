@@ -61,8 +61,10 @@ IMAPFE and pass it as the second argument to the AUTHENTICATE command.
 """
 
 import base64
+import imaplib
 import json
 from optparse import OptionParser
+import smtplib
 import sys
 import urllib
 
@@ -99,6 +101,14 @@ def SetupOptionParser():
                     help='scope for the access token. Multiple scopes can be '
                          'listed separated by spaces with the whole argument '
                          'quoted.')
+  parser.add_option('--test_imap_authentication',
+                    action='store_true',
+                    dest='test_imap_authentication',
+                    help='attempts to authenticate to IMAP')
+  parser.add_option('--test_smtp_authentication',
+                    action='store_true',
+                    dest='test_smtp_authentication',
+                    help='attempts to authenticate to SMTP')
   parser.add_option('--user',
                     default=None,
                     help='email address of user whose account is being '
@@ -242,6 +252,39 @@ def GenerateOAuth2String(username, access_token, base64_encode=True):
   return auth_string
 
 
+def TestImapAuthentication(user, auth_string):
+  """Authenticates to IMAP with the given auth_string.
+
+  Prints a debug trace of the attempted IMAP connection.
+
+  Args:
+    user: The Gmail username (full email address)
+    auth_string: A valid OAuth2 string, as returned by GenerateOAuth2String.
+        Must not be base64-encoded, since imaplib does its own base64-encoding.
+  """
+  print
+  imap_conn = imaplib.IMAP4_SSL('imap.gmail.com')
+  imap_conn.debug = 4
+  imap_conn.authenticate('XOAUTH2', lambda x: auth_string)
+  imap_conn.select('INBOX')
+
+
+def TestSmtpAuthentication(user, auth_string):
+  """Authenticates to SMTP with the given auth_string.
+
+  Args:
+    user: The Gmail username (full email address)
+    auth_string: A valid OAuth2 string, not base64-encoded, as returned by
+        GenerateOAuth2String.
+  """
+  print
+  smtp_conn = smtplib.SMTP('smtp.gmail.com', 587)
+  smtp_conn.set_debuglevel(True)
+  smtp_conn.ehlo('test')
+  smtp_conn.starttls()
+  smtp_conn.docmd('AUTH', 'XOAUTH2 ' + base64.b64encode(auth_string))
+
+
 def RequireOptions(options, *args):
   missing = [arg for arg in args if getattr(options, arg) is None]
   if missing:
@@ -272,6 +315,16 @@ def main(argv):
     print 'Refresh Token: %s' % response['refresh_token']
     print 'Access Token: %s' % response['access_token']
     print 'Access Token Expiration Seconds: %s' % response['expires_in']
+  elif options.test_imap_authentication:
+    RequireOptions(options, 'user', 'access_token')
+    TestImapAuthentication(options.user,
+        GenerateOAuth2String(options.user, options.access_token,
+                             base64_encode=False))
+  elif options.test_smtp_authentication:
+    RequireOptions(options, 'user', 'access_token')
+    TestSmtpAuthentication(options.user,
+        GenerateOAuth2String(options.user, options.access_token,
+                             base64_encode=False))
   else:
     options_parser.print_help()
     print 'Nothing to do, exiting.'
