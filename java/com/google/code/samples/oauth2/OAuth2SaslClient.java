@@ -75,7 +75,6 @@ class OAuth2SaslClient implements SaslClient {
     }
     String email = nameCallback.getName();
 
-    OAuth2SaslResponseBuilder responseBuilder = new OAuth2SaslResponseBuilder();
     byte[] response = String.format("user=%s\1auth=Bearer %s\1\1", email,
                                     oauthToken).getBytes();
     isComplete = true;
