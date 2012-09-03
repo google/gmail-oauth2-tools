@@ -28,7 +28,9 @@
 # being zipped up.
 
 
-files="README-java-sample.txt build.xml build.properties com/google/code/samples/oauth2/*.java"
+top_level_files="README-java-sample.txt build.xml build.properties ../python/oauth2.py"
+relative_files="com/google/code/samples/oauth2/*.java"
+all_files="$top_level_files $relative_files"
 
 if [[ "$1" ]] ; then
   date="$1"
@@ -50,7 +52,7 @@ if [[ -e $outfile ]]; then
   exit -1
 fi
 
-status=$(svn status $files)
+status=$(svn status $all_files)
 if [[ "$status" ]] ; then
   echo "ERROR: One or more files has uncommitted changes:"
   echo "$status"
@@ -58,7 +60,8 @@ if [[ "$status" ]] ; then
 fi
 
 mkdir -p $full_tmpdir
-cp --parents $files $full_tmpdir
+cp $top_level_files $full_tmpdir
+cp --parents $relative_files $full_tmpdir
 
 cd /tmp
 zip -r $outfile $relative_tmpdir
