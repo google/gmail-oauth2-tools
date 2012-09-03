@@ -1,3 +1,3 @@
 This project contains sample code for using OAuth2 with Gmail.
 
-OAuth2DotPyRunThrough gives a quick run through of OAuth2 using the Python sample code.
+[OAuth2DotPyRunThrough] gives a quick run through of OAuth2 using the Python sample code.
