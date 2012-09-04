@@ -1,5 +1,5 @@
-This project contains sample code for using OAuth2 with Gmail.
+This project contains sample code for using OAuth 2.0 with Gmail. The code here focuses on using OAuth credentials to connect to Gmail. There is much more sample code available, including examples of obtaining and authorizing OAuth credentials, in the [https://developers.google.com/accounts/docs/OAuth2#libraries Google APIs Client Libraries].
 
-[OAuth2DotPyRunThrough] gives a quick run through of OAuth2 using the Python sample code.
+[OAuth2DotPyRunThrough] gives a quick run through of using the Python sample code to generate and authorize OAuth 2.0 credentials, and to use them to connect to Gmail.
 
-[JavaSampleCode] describes the Java sample code.
+[JavaSampleCode] describes the Java sample code for connecting to Gmail with OAuth 2.0 credentials.
