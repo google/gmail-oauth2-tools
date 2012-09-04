@@ -1,0 +1,22 @@
+#summary PHP sample code
+
+= Using the PHP sample code =
+
+The PHP sample code is available for browsing in the [http://code.google.com/p/google-mail-oauth2-tools/source/browse/trunk/php/ repository], and can also be downloaded in a [http://google-mail-oauth2-tools.googlecode.com/files/oauth2-php-samples.zip ZIP file].
+
+Using this sample code requires that you already have an OAuth 2.0 access token. To authorize an access token from a PHP application, use the [http://code.google.com/p/google-api-php-client/wiki/OAuth2 Google APIs Client Library for PHP]. For testing, you can acquire an access token with [OAuth2DotPyRunThrough oauth2.py].
+
+== Libraries ==
+The download ZIP file contains a copy of the Zend framework libraries. Alternatively, you can download the Zend framework from
+[http://framework.zend.com/releases/ZendFramework-1.12.0/ZendFramework-1.12.0-minimal.zip zend.com], or install it with your system's software package manager.
+
+== Downloading ==
+Download the sample code package from
+[http://google-mail-oauth2-tools.googlecode.com/files/oauth2-php-samples.zip here], unzip it, and make sure the oauth2-php-sample is in a web-accessible directory.
+
+== Running the sample app ==
+Visit !http://<yourserver>/oauth2-php-samples/oauth2.php to run the OAuth 2.0 sample. Enter a Gmail email address and an access token that is authorized to access that account, then click Submit. You should see an output of the count of messages in your inbox along with the subject lines of the emails.
+
+== Exploring the sample code ==
+
+The high-level sample code is in [http://code.google.com/p/google-mail-oauth2-tools/source/browse/#svn/trunk/php SVN] along with plenty of comments.
