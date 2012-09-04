@@ -52,14 +52,13 @@ function oauth2Authenticate($imap, $email, $accessToken) {
     $response = "";
     $is_plus = $imap->readLine($response, '+', true);
     if ($is_plus) {
-      echo("<p>got an extra server challenge: $response");
-      echo("<p>(" . base64_decode($response) . ")");
-      echo("<p>sending empty client response");
+      error_log("got an extra server challenge: $response");
+      // Send empty client response.
       $imap->sendRequest('');
     } else {
       if (preg_match('/^NO /i', $response) ||
           preg_match('/^BAD /i', $response)) {
-        echo("<p>got failure response: $response");
+        error_log("got failure response: $response");
         return false;
       } else if (preg_match("/^OK /i", $response)) {
         return true;
