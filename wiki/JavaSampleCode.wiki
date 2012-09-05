@@ -2,7 +2,7 @@
 
 = Using the Java sample code =
 
-The Java sample code is available for browsing in the [http://code.google.com/p/google-mail-oauth2-tools/source/browse/trunk/java/ repository], and can also be downloaded in a [http://google-mail-oauth-tools.googlecode.com/files/oauth2-java-sample-20120904.zip ZIP file].
+The Java sample code is available for browsing in the [http://code.google.com/p/google-mail-oauth2-tools/source/browse/trunk/java/ repository], and can also be downloaded in a [http://google-mail-oauth2-tools.googlecode.com/files/oauth2-java-sample-20120904.zip ZIP file].
 
 == Prerequisites ==
 You'll need the following packages installed on your system to run the sample code:
