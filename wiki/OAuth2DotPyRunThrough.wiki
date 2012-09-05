@@ -26,7 +26,15 @@ To authorize token, visit this url and follow the directions:
 Enter verification code:
 }}}
 
-Visit the URL in your browser, and click the "Allow access" button. Copy that code and paste it in the `oauth2.py` script window, and hit `<Enter>`. `oauth2.py` will respond with a refresh token, temporary access token, and the temporary access token expiration time.
+Visit the URL in your browser. You may need to login to Google. Then you should see a request to grant access to your application:
+
+[http://google-mail-oauth2-tools.googlecode.com/files/runthrough-access-request.png]
+
+Click the "Allow access" button, and you will be presented a verification code:
+
+[http://google-mail-oauth2-tools.googlecode.com/files/runthrough-access-grant.png]
+
+Copy that code and paste it in the `oauth2.py` script window, and hit `<Enter>`. `oauth2.py` will respond with a refresh token, temporary access token, and the temporary access token expiration time.
 
 {{{
 $ python oauth2.py --generate_oauth2_token --client_id=364545978226.apps.googleusercontent.com --client_secret=zNrNsBzOOnQy8_O-8LkofeTR
