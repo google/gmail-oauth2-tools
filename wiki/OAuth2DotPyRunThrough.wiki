@@ -40,7 +40,7 @@ Copy that code and paste it in the `oauth2.py` script window, and hit `<Enter>`.
 $ python oauth2.py --generate_oauth2_token --client_id=364545978226.apps.googleusercontent.com --client_secret=zNrNsBzOOnQy8_O-8LkofeTR
 To authorize token, visit this url and follow the directions:
   https://accounts.google.com/o/oauth2/auth?client_id=364545978226.apps.googleusercontent.com&redirect_uri=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob&response_type=code&scope=https%3A%2F%2Fmail.google.com%2F
-Enter verification code: 4/6_ZYXTQrdkMYZk0CgCtt2Tk3ltsX.ks7wGB_ELSUeuJJVnL49Cc-ET3L_cgI
+Enter verification code: 4/0YMdz2qZnlqgafVQTbw33HYh4_H-.Qi3vpYBlkokfuJJV
 Refresh Token: 1/q4SaB2JMQB9I-an6F1rxJE9OkOMtfjaz1bPm1tfDpQM
 Access Token: ya29.AHES6ZRKeUQwH2xhirksSUDSyjg9oPuRMMal05Ty0cfFIT_uRfESHw
 Access Token Expiration Seconds: 3600
