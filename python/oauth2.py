@@ -18,7 +18,7 @@
 
 To use this script, you'll need to have registered with Google as an OAuth
 application and obtained an OAuth client ID and client secret.
-See http://code.google.com/apis/accounts/docs/OAuth2.html for instructions on
+See https://developers.google.com/identity/protocols/OAuth2 for instructions on
 registering and for documentation of the APIs invoked by this code.
 
 This script has 3 modes of operation.
