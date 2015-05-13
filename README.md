@@ -1,4 +1,4 @@
-Tools and sample code for authenticating to Google Mail with OAuth2.
+Tools and sample code for authenticating to Gmail with OAuth2.
 
 The specification is available [here](https://developers.google.com/gmail/xoauth2_protocol).
 
