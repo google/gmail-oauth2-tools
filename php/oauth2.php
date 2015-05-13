@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  * Sample code for authenticating to Gmail with OAuth2. See
- * https://code.google.com/p/google-mail-oauth2-tools/wiki/PhpSampleCode
+ * https://github.com/google/gmail-oauth2-tools/wiki
  * for documentation.
  * -->
 <html>
