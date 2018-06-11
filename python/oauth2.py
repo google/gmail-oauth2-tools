@@ -113,6 +113,12 @@ def SetupOptionParser():
                     default=None,
                     help='email address of user whose account is being '
                          'accessed')
+  parser.add_option('--quiet',
+                    action='store_true',
+                    default=False,
+                    dest='quiet',
+                    help='Omit verbose descriptions and only print '
+                         'machine-readable outputs.')
   return parser
 
 
@@ -299,12 +305,18 @@ def main(argv):
     RequireOptions(options, 'client_id', 'client_secret')
     response = RefreshToken(options.client_id, options.client_secret,
                             options.refresh_token)
-    print 'Access Token: %s' % response['access_token']
-    print 'Access Token Expiration Seconds: %s' % response['expires_in']
+    if options.quiet:
+      print response['access_token']
+    else:
+      print 'Access Token: %s' % response['access_token']
+      print 'Access Token Expiration Seconds: %s' % response['expires_in']
   elif options.generate_oauth2_string:
     RequireOptions(options, 'user', 'access_token')
-    print ('OAuth2 argument:\n' +
-           GenerateOAuth2String(options.user, options.access_token))
+    oauth2_string = GenerateOAuth2String(options.user, options.access_token)
+    if options.quiet:
+      print oauth2_string
+    else:
+      print 'OAuth2 argument:\n' + oauth2_string
   elif options.generate_oauth2_token:
     RequireOptions(options, 'client_id', 'client_secret')
     print 'To authorize token, visit this url and follow the directions:'
