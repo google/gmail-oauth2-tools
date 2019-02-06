@@ -215,7 +215,8 @@ def AuthorizeTokens(client_id, client_secret, authorization_code):
   params['grant_type'] = 'authorization_code'
   request_url = AccountsUrl('o/oauth2/token')
 
-  response = six.moves.urllib.request.urlopen(request_url, six.moves.urllib.parse.urlencode(params)).read()
+  response = six.moves.urllib.request.urlopen(
+    request_url, six.moves.urllib.parse.urlencode(params).encode('utf-8')).read()
   return json.loads(response)
 
 
@@ -239,7 +240,8 @@ def RefreshToken(client_id, client_secret, refresh_token):
   params['grant_type'] = 'refresh_token'
   request_url = AccountsUrl('o/oauth2/token')
 
-  response = six.moves.urllib.request.urlopen(request_url, six.moves.urllib.parse.urlencode(params)).read()
+  response = six.moves.urllib.request.urlopen(
+    request_url, six.moves.urllib.parse.urlencode(params).encode('utf-8')).read()
   return json.loads(response)
 
 
