@@ -70,6 +70,8 @@ import smtplib
 import sys
 import urllib
 
+import six
+
 
 def SetupOptionParser():
   # Usage message is the module's docstring.
@@ -146,12 +148,12 @@ def AccountsUrl(command):
 
 def UrlEscape(text):
   # See OAUTH 5.1 for a definition of which characters need to be escaped.
-  return urllib.quote(text, safe='~-._')
+  return six.moves.urllib.parse.quote(text, safe='~-._')
 
 
 def UrlUnescape(text):
   # See OAUTH 5.1 for a definition of which characters need to be escaped.
-  return urllib.unquote(text)
+  return six.moves.urllib.parse.unquote(text)
 
 
 def FormatUrlParams(params):
@@ -213,7 +215,7 @@ def AuthorizeTokens(client_id, client_secret, authorization_code):
   params['grant_type'] = 'authorization_code'
   request_url = AccountsUrl('o/oauth2/token')
 
-  response = urllib.urlopen(request_url, urllib.urlencode(params)).read()
+  response = six.moves.urllib.request.urlopen(request_url, six.moves.urllib.parse.urlencode(params)).read()
   return json.loads(response)
 
 
@@ -237,7 +239,7 @@ def RefreshToken(client_id, client_secret, refresh_token):
   params['grant_type'] = 'refresh_token'
   request_url = AccountsUrl('o/oauth2/token')
 
-  response = urllib.urlopen(request_url, urllib.urlencode(params)).read()
+  response = six.moves.urllib.request.urlopen(request_url, six.moves.urllib.parse.urlencode(params)).read()
   return json.loads(response)
 
 
@@ -323,7 +325,7 @@ def main(argv):
     RequireOptions(options, 'client_id', 'client_secret')
     print('To authorize token, visit this url and follow the directions:')
     print('  %s' % GeneratePermissionUrl(options.client_id, options.scope))
-    authorization_code = raw_input('Enter verification code: ')
+    authorization_code = six.moves.input('Enter verification code: ')
     response = AuthorizeTokens(options.client_id, options.client_secret,
                                 authorization_code)
     print('Refresh Token: %s' % response['refresh_token'])
