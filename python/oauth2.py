@@ -164,7 +164,7 @@ def FormatUrlParams(params):
     A URL query string version of the given parameters.
   """
   param_fragments = []
-  for param in sorted(params.iteritems(), key=lambda x: x[0]):
+  for param in sorted(params.items(), key=lambda x: x[0]):
     param_fragments.append('%s=%s' % (param[0], UrlEscape(param[1])))
   return '&'.join(param_fragments)
 
