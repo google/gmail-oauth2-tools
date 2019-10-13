@@ -37,13 +37,19 @@ import (
 )
 
 var (
+	gsuite bool
 	sender string
 	setUp  bool
 	dummyF string
 	dummyI bool
 )
 
+const (
+	atDomain = "@gmail.com"
+)
+
 func init() {
+	flag.BoolVar(&gsuite, "gsuite", false, "If true, sendgmail allows setting up with arbitrary domains.")
 	flag.StringVar(&sender, "sender", "", "Specifies the sender's email address.")
 	flag.BoolVar(&setUp, "setup", false, "If true, sendgmail sets up the sender's OAuth2 token and then exits.")
 	flag.StringVar(&dummyF, "f", "", "Dummy flag for compatibility with sendmail.")
@@ -52,12 +58,12 @@ func init() {
 
 func main() {
 	flag.Parse()
-	if atDomain := "@gmail.com"; !strings.HasSuffix(sender, atDomain) {
-		log.Fatalf("-sender must specify an %v email address.", atDomain)
-	}
 	config := getConfig()
 	tokenPath := fmt.Sprintf("%v/.sendgmail.%v.json", os.Getenv("HOME"), sender)
 	if setUp {
+		if !gsuite && !strings.HasSuffix(sender, atDomain) {
+			log.Fatalf("-sender must specify an %v email address.", atDomain)
+		}
 		setUpToken(config, tokenPath)
 		return
 	}
