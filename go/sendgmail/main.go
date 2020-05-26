@@ -30,7 +30,6 @@ import (
 	"log"
 	"net/smtp"
 	"os"
-	"strings"
 
 	"golang.org/x/oauth2"
 	googleOAuth2 "golang.org/x/oauth2/google"
@@ -52,9 +51,6 @@ func init() {
 
 func main() {
 	flag.Parse()
-	if atDomain := "@gmail.com"; !strings.HasSuffix(sender, atDomain) {
-		log.Fatalf("-sender must specify an %v email address.", atDomain)
-	}
 	config := getConfig()
 	tokenPath := fmt.Sprintf("%v/.sendgmail.%v.json", os.Getenv("HOME"), sender)
 	if setUp {
