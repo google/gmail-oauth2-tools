@@ -226,7 +226,7 @@ def AuthorizeTokens(client_id, client_secret, authorization_code):
   data = urlencode(params).encode('utf-8')
 
   response = urlopen(request_url, data).read()
-  return json.loads(response, encoding='utf-8')
+  return json.loads(response.decode('utf-8'))
 
 
 def RefreshToken(client_id, client_secret, refresh_token):
@@ -252,7 +252,7 @@ def RefreshToken(client_id, client_secret, refresh_token):
   data = urlencode(params).encode('utf-8')
 
   response = urlopen(request_url, data).read()
-  return json.loads(response, encoding='utf-8')
+  return json.loads(response.decode('utf-8'))
 
 
 def GenerateOAuth2String(username, access_token, base64_encode=True):
