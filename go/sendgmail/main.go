@@ -32,6 +32,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/google/uuid"
 	"golang.org/x/oauth2"
 	googleOAuth2 "golang.org/x/oauth2/google"
 )
@@ -64,13 +65,17 @@ func main() {
 	sendMessage(config, tokenPath)
 }
 
-func getConfig() *oauth2.Config {
+func configJSON() []byte {
 	configPath := fmt.Sprintf("%v/.sendgmail.json", os.Getenv("HOME"))
 	configJSON, err := ioutil.ReadFile(configPath)
 	if err != nil {
 		log.Fatalf("Failed to read config: %v.", err)
 	}
-	config, err := googleOAuth2.ConfigFromJSON(configJSON, "https://mail.google.com/")
+	return configJSON
+}
+
+func getConfig() *oauth2.Config {
+	config, err := googleOAuth2.ConfigFromJSON(configJSON(), "https://mail.google.com/")
 	if err != nil {
 		log.Fatalf("Failed to parse config: %v.", err)
 	}
@@ -78,19 +83,28 @@ func getConfig() *oauth2.Config {
 }
 
 func setUpToken(config *oauth2.Config, tokenPath string) {
-	fmt.Println()
-	fmt.Println("1. Ensure that you are logged in as", sender, "in your browser.")
-	fmt.Println()
-	fmt.Println("2. Open the following link and authorise sendgmail:")
-	fmt.Println(config.AuthCodeURL("state", oauth2.AccessTypeOffline))
-	fmt.Println()
-	fmt.Println("3. Enter the authorisation code:")
-	var code string
-	if _, err := fmt.Scan(&code); err != nil {
-		log.Fatalf("Failed to read authorisation code: %v.", err)
+	state := uuid.NewString()
+	authHandler := func(authCodeURL string) (string, string, error) {
+		fmt.Println()
+		fmt.Println("1. Ensure that you are logged in as", sender, "in your browser.")
+		fmt.Println()
+		fmt.Println("2. Open the following link and authorise sendgmail:")
+		fmt.Println(authCodeURL + "&access_type=offline") // hack to obtain a refresh token
+		fmt.Println()
+		fmt.Println("3. Enter the authorisation code:")
+		var code string
+		if _, err := fmt.Scan(&code); err != nil {
+			log.Fatalf("Failed to read authorisation code: %v.", err)
+		}
+		fmt.Println()
+		return code, state, nil
 	}
-	fmt.Println()
-	token, err := config.Exchange(context.Background(), code)
+	credentialsParams := googleOAuth2.CredentialsParams{Scopes: config.Scopes, State: state, AuthHandler: authHandler}
+	credentials, err := googleOAuth2.CredentialsFromJSONWithParams(context.Background(), configJSON(), credentialsParams)
+	if err != nil {
+		log.Fatalf("Failed to obtain credentials: %v.", err)
+	}
+	token, err := credentials.TokenSource.Token()
 	if err != nil {
 		log.Fatalf("Failed to exchange authorisation code for token: %v.", err)
 	}
