@@ -43,7 +43,7 @@ Run the following command to build and install sendgmail to
 `GOPATH/bin/sendgmail`:
 
 ```shell
-go install github.com/junyer/gmail-oauth2-tools/go/sendgmail@latest
+go install github.com/google/gmail-oauth2-tools/go/sendgmail@latest
 ```
 
 ## Obtaining OAuth2 credentials for yourself

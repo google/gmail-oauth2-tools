@@ -1,4 +1,4 @@
-module github.com/junyer/gmail-oauth2-tools/go/sendgmail
+module github.com/google/gmail-oauth2-tools/go/sendgmail
 
 go 1.20
 
