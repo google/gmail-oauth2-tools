@@ -23,6 +23,8 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -34,6 +36,7 @@ import (
 
 	"github.com/google/uuid"
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/authhandler"
 	googleOAuth2 "golang.org/x/oauth2/google"
 )
 
@@ -99,7 +102,11 @@ func setUpToken(config *oauth2.Config, tokenPath string) {
 		fmt.Println()
 		return code, state, nil
 	}
-	credentialsParams := googleOAuth2.CredentialsParams{Scopes: config.Scopes, State: state, AuthHandler: authHandler}
+	verifier := uuid.NewString()
+	s256 := sha256.Sum256([]byte(verifier))
+	challenge := base64.RawURLEncoding.EncodeToString(s256[:])
+	pkceParams := authhandler.PKCEParams{Challenge: challenge, ChallengeMethod: "S256", Verifier: verifier}
+	credentialsParams := googleOAuth2.CredentialsParams{Scopes: config.Scopes, State: state, AuthHandler: authHandler, PKCE: &pkceParams}
 	credentials, err := googleOAuth2.CredentialsFromJSONWithParams(context.Background(), configJSON(), credentialsParams)
 	if err != nil {
 		log.Fatalf("Failed to obtain credentials: %v.", err)
