@@ -26,7 +26,7 @@ send-email`.
         for seeing the authorisation code on a page in your browser.
 
     *   When you download the credentials as JSON, save the file to your home
-        directory as `.sendgmail.json`.
+        directory as `.sendgmail.json` with file mode `0600`.
 
 3.  Go back to **APIs & Services > OAuth consent screen** in the Google Cloud
     console.
