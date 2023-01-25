@@ -56,8 +56,13 @@ func init() {
 
 func main() {
 	flag.Parse()
-	if atDomain := "@gmail.com"; !strings.HasSuffix(sender, atDomain) {
-		log.Fatalf("-sender must specify an %v email address.", atDomain)
+	// Originally, this checked for "@gmail.com" as a suffix,
+	// but any Google Workspace domain can also be supported.
+	// Checking only for '@' gives rudimentary assurance that
+	// the user specified an email address; the complexity of
+	// performing deeper checks is unwarranted at this point.
+	if !strings.ContainsRune(sender, '@') {
+		log.Fatalf("-sender must specify an email address.")
 	}
 	config := getConfig()
 	tokenPath := fmt.Sprintf("%v/.sendgmail.%v.json", os.Getenv("HOME"), sender)
