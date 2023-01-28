@@ -28,6 +28,11 @@ send-email`.
     *   When you download the credentials as JSON, save the file to your home
         directory as `.sendgmail.json` with file mode `0600`.
 
+        If complying with the XDG Base Directory Specification, instead create
+        the `${XDG_CONFIG_HOME:-${HOME}/.config}/sendgmail` directory with file
+        mode `0700` and then save the file to that directory as `config.json`
+        with file mode `0600`.
+
 3.  Go back to **APIs & Services > OAuth consent screen** in the Google Cloud
     console.
 
@@ -44,6 +49,12 @@ Run the following command to build and install sendgmail to
 
 ```shell
 go install github.com/google/gmail-oauth2-tools/go/sendgmail@latest
+```
+
+If complying with the XDG Base Directory Specification, instead run:
+
+```shell
+go install -tags xdg github.com/google/gmail-oauth2-tools/go/sendgmail@latest
 ```
 
 ## Obtaining OAuth2 credentials for yourself

@@ -65,17 +65,15 @@ func main() {
 		log.Fatalf("-sender must specify an email address.")
 	}
 	config := getConfig()
-	tokenPath := fmt.Sprintf("%v/.sendgmail.%v.json", os.Getenv("HOME"), sender)
 	if setUp {
-		setUpToken(config, tokenPath)
+		setUpToken(config)
 		return
 	}
-	sendMessage(config, tokenPath)
+	sendMessage(config)
 }
 
 func configJSON() []byte {
-	configPath := fmt.Sprintf("%v/.sendgmail.json", os.Getenv("HOME"))
-	configJSON, err := ioutil.ReadFile(configPath)
+	configJSON, err := ioutil.ReadFile(configPath())
 	if err != nil {
 		log.Fatalf("Failed to read config: %v.", err)
 	}
@@ -90,7 +88,7 @@ func getConfig() *oauth2.Config {
 	return config
 }
 
-func setUpToken(config *oauth2.Config, tokenPath string) {
+func setUpToken(config *oauth2.Config) {
 	state := uuid.NewString()
 	authHandler := func(authCodeURL string) (string, string, error) {
 		fmt.Println()
@@ -120,7 +118,7 @@ func setUpToken(config *oauth2.Config, tokenPath string) {
 	if err != nil {
 		log.Fatalf("Failed to exchange authorisation code for token: %v.", err)
 	}
-	tokenFile, err := os.OpenFile(tokenPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	tokenFile, err := os.OpenFile(tokenPath(), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		log.Fatalf("Failed to open token file for writing: %v.", err)
 	}
@@ -130,8 +128,8 @@ func setUpToken(config *oauth2.Config, tokenPath string) {
 	}
 }
 
-func sendMessage(config *oauth2.Config, tokenPath string) {
-	tokenFile, err := os.Open(tokenPath)
+func sendMessage(config *oauth2.Config) {
+	tokenFile, err := os.Open(tokenPath())
 	if err != nil {
 		log.Fatalf("Failed to open token file for reading: %v.", err)
 	}
