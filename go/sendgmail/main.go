@@ -95,7 +95,7 @@ func setUpToken(config *oauth2.Config) {
 		fmt.Println("1. Ensure that you are logged in as", sender, "in your browser.")
 		fmt.Println()
 		fmt.Println("2. Open the following link and authorise sendgmail:")
-		fmt.Println(authCodeURL + "&access_type=offline") // hack to obtain a refresh token
+		fmt.Println(authCodeURL + "&access_type=offline&prompt=consent") // hack to obtain a refresh token
 		fmt.Println()
 		fmt.Println("3. Enter the authorisation code:")
 		var code string
