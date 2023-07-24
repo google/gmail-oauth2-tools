@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.google.code.samples.oauth2;
+package main.com.google.code.samples.oauth2;
 
 import com.sun.mail.imap.IMAPStore;
 import com.sun.mail.imap.IMAPSSLStore;

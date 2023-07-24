@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.google.code.samples.oauth2;
+package main.com.google.code.samples.oauth2;
 
 import java.io.IOException;
 import java.util.logging.Logger;
