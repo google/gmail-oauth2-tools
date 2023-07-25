@@ -42,6 +42,14 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                   <archive>
+                     <manifest>
+                       <addClasspath>true</addClasspath>
+                       <mainClass>com.google.code.samples.oauth2.OAuth2Authenticator</mainClass>
+                     </manifest>
+                   </archive>
+                </configuration>
             </plugin>
         </plugins>
     </build>
