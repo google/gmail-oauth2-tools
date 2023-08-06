@@ -13,19 +13,19 @@
  * limitations under the License.
  */
 
-package com.google.code.samples.oauth2;
+package main.com.google.code.samples.oauth2;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.sasl.SaslClient;
 import javax.security.sasl.SaslException;
+
+import org.apache.maven.surefire.shared.lang3.NotImplementedException;
 
 
 /**
@@ -48,6 +48,12 @@ class OAuth2SaslClient implements SaslClient {
                           CallbackHandler callbackHandler) {
     this.oauthToken = oauthToken;
     this.callbackHandler = callbackHandler;
+  }
+
+  public OAuth2SaslClient()
+  {
+    this.oauthToken = null;
+    this.callbackHandler = null;
   }
 
   public String getMechanismName() {
@@ -87,12 +93,12 @@ class OAuth2SaslClient implements SaslClient {
 
   public byte[] unwrap(byte[] incoming, int offset, int len)
       throws SaslException {
-    throw new IllegalStateException();
+    throw new NotImplementedException();
   }
 
   public byte[] wrap(byte[] outgoing, int offset, int len)
       throws SaslException {
-    throw new IllegalStateException();
+    throw new NotImplementedException();
   }
 
   public Object getNegotiatedProperty(String propName) {
