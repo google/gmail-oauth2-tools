@@ -15,7 +15,7 @@ import org.mockito.Mock;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import javax.security.auth.callback.CallbackHandler;
-
+import java.lang.reflect.Field;
 import main.com.google.code.samples.oauth2.OAuth2SaslClient;
 
 class OAuth2SaslClientTests {
@@ -48,5 +48,19 @@ class OAuth2SaslClientTests {
     public void hasInitialResponseTest()
     {
         assertTrue(oAuth2SaslClient.hasInitialResponse());
+    }
+
+    public Field getPrivateFieldObject (String nameOfField) throws NoSuchFieldException
+    {
+        return OAuth2SaslClient.class.getDeclaredField(nameOfField);
+    }
+
+    @Test
+    public void getNegotiatedPropertyMechanismName() throws IllegalAccessException, NoSuchFieldException
+    {
+        Field f = getPrivateFieldObject("MechanismName");
+        f.setAccessible(true);
+        String name = (String)f.get(this.oAuth2SaslClient);
+        assertEquals(oAuth2SaslClient.getMechanismName(), name);
     }
 }
