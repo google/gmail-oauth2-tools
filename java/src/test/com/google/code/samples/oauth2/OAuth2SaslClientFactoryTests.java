@@ -1,4 +1,4 @@
-package main.com.google.code.samples.oauth2;
+package main.pro.freemania.code.samples.oauth2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assume.assumeTrue;
