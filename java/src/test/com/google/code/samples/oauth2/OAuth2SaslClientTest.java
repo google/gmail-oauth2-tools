@@ -16,7 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 
 /**
-* The OAuth2SaslClientTest runs a set of assumptions on modular arithemetic then tests various portions of OAuth2SaslClient class
+* The OAuth2SaslClientTest tests various portions of OAuth2SaslClient class
 *
 * @author  John H. Freeman
 * @version 1.0

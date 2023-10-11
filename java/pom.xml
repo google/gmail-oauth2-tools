@@ -13,7 +13,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>11</java.version>
+        <java.version>${javaVersion}</java.version>
     </properties>
     <dependencies>
         <dependency>
@@ -39,8 +39,8 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>${javaVersion}</source>
+                    <target>${javaVersion}</target>
                 </configuration>
                 <version>3.11.0</version>
             </plugin>
