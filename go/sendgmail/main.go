@@ -28,7 +28,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/smtp"
 	"os"
@@ -73,7 +73,7 @@ func main() {
 }
 
 func configJSON() []byte {
-	configJSON, err := ioutil.ReadFile(configPath())
+	configJSON, err := os.ReadFile(configPath())
 	if err != nil {
 		log.Fatalf("Failed to read config: %v.", err)
 	}
@@ -139,7 +139,7 @@ func sendMessage(config *oauth2.Config) {
 		log.Fatalf("Failed to read token: %v.", err)
 	}
 	tokenSource := config.TokenSource(context.Background(), &token)
-	message, err := ioutil.ReadAll(os.Stdin)
+	message, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		log.Fatalf("Failed to read message: %v.", err)
 	}
