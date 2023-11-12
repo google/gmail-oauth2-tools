@@ -38,6 +38,8 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/authhandler"
 	googleOAuth2 "golang.org/x/oauth2/google"
+	"google.golang.org/api/gmail/v1"
+	"google.golang.org/api/option"
 )
 
 var (
@@ -81,7 +83,7 @@ func configJSON() []byte {
 }
 
 func getConfig() *oauth2.Config {
-	config, err := googleOAuth2.ConfigFromJSON(configJSON(), "https://mail.google.com/")
+	config, err := googleOAuth2.ConfigFromJSON(configJSON(), gmail.GmailSendScope)
 	if err != nil {
 		log.Fatalf("Failed to parse config: %v.", err)
 	}
@@ -143,7 +145,12 @@ func sendMessage(config *oauth2.Config) {
 	if err != nil {
 		log.Fatalf("Failed to read message: %v.", err)
 	}
-	if err := smtp.SendMail("smtp.gmail.com:587", authWith(tokenSource), sender, flag.Args(), message); err != nil {
+	service, err := gmail.NewService(context.Background(), option.WithTokenSource(tokenSource))
+	if err != nil {
+		log.Fatalf("Failed to create service: %v.", err)
+	}
+	_, err = service.Users.Messages.Send(sender, &gmail.Message{Raw: base64.URLEncoding.EncodeToString(message)}).Do()
+	if err != nil {
 		log.Fatalf("Failed to send message: %v.", err)
 	}
 }

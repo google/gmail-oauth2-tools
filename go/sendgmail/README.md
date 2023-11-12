@@ -39,8 +39,8 @@ send-email`.
     *   Add `USERNAME@gmail.com` as a test user. This is necessary for using the
         project that you created.
 
-    *   Add `https://mail.google.com/` as a scope. This is necessary for using
-        Gmail via SMTP.
+    *   Add `https://www.googleapis.com/auth/gmail.send` as a scope. This is
+        necessary for using the Gmail API to send emails.
 
 ## Installing sendgmail
 
