@@ -32,7 +32,9 @@ import (
 	"log"
 	"net/smtp"
 	"os"
+	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/google/uuid"
 	"golang.org/x/oauth2"
@@ -173,4 +175,48 @@ func (a *auth) Next(fromServer []byte, more bool) ([]byte, error) {
 		return nil, fmt.Errorf("unexpected challenge: %v", string(fromServer))
 	}
 	return nil, nil
+}
+
+func userConfigDir() string {
+	if dir := os.Getenv("XDG_CONFIG_HOME"); dir != "" {
+		return dir
+	}
+	if dir := os.Getenv("HOME"); dir != "" {
+		return filepath.Join(dir, ".config")
+	}
+	panic("Neither $XDG_CONFIG_HOME nor $HOME is defined.")
+}
+
+func userHomeDir() string {
+	dir, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatalf("Failed to get user home directory: %v.", err)
+	}
+	return dir
+}
+
+var isXDG = sync.OnceValue(func() bool {
+	if _, err := os.Stat(filepath.Join(userConfigDir(), "sendgmail", "config.json")); err == nil {
+		return true
+	}
+	if _, err := os.Stat(filepath.Join(userHomeDir(), ".sendgmail.json")); err == nil {
+		return false
+	}
+	return true
+})
+
+func configPath() string {
+	if isXDG() {
+		return filepath.Join(userConfigDir(), "sendgmail", "config.json")
+	} else {
+		return filepath.Join(userHomeDir(), ".sendgmail.json")
+	}
+}
+
+func tokenPath() string {
+	if isXDG() {
+		return filepath.Join(userConfigDir(), "sendgmail", "token."+sender+".json")
+	} else {
+		return filepath.Join(userHomeDir(), ".sendgmail."+sender+".json")
+	}
 }
