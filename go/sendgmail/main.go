@@ -22,6 +22,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
@@ -30,7 +31,7 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net/smtp"
+	"net/mail"
 	"os"
 	"path/filepath"
 	"strings"
@@ -40,6 +41,8 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/authhandler"
 	googleOAuth2 "golang.org/x/oauth2/google"
+	"google.golang.org/api/gmail/v1"
+	"google.golang.org/api/option"
 )
 
 var (
@@ -83,7 +86,7 @@ func configJSON() []byte {
 }
 
 func getConfig() *oauth2.Config {
-	config, err := googleOAuth2.ConfigFromJSON(configJSON(), "https://mail.google.com/")
+	config, err := googleOAuth2.ConfigFromJSON(configJSON(), gmail.GmailSendScope)
 	if err != nil {
 		log.Fatalf("Failed to parse config: %v.", err)
 	}
@@ -130,6 +133,55 @@ func setUpToken(config *oauth2.Config) {
 	}
 }
 
+func extractAddrs(message *mail.Message, header string) []*mail.Address {
+	rawTo := message.Header.Get(header)
+	if rawTo == "" {
+		return nil
+	}
+	addrs, err := mail.ParseAddressList(rawTo)
+	if err != nil {
+		log.Fatalf("Failed to parse %s list %q: %v.", header, message.Header.Get("To"), err)
+	}
+	return addrs
+}
+
+func computeBCCHeader(rawMessage []byte) string {
+	// parse the message
+	message, err := mail.ReadMessage(bytes.NewReader(rawMessage))
+	if err != nil {
+		log.Fatalf("Failed to parse message: %v.", err)
+	}
+
+	// abort if there's already a Bcc header
+	if message.Header.Get("Bcc") != "" {
+		return ""
+	}
+
+	// collects bcc addresses from the command-line arguments
+	bccs := make(map[string]bool)
+	for _, addr := range flag.Args() {
+		bccs[addr] = true
+	}
+
+	// remove addresses that were already in To: or Cc:
+	for _, to := range extractAddrs(message, "To") {
+		delete(bccs, to.Address)
+	}
+	for _, cc := range extractAddrs(message, "Cc") {
+		delete(bccs, cc.Address)
+	}
+
+	// return the generated header
+	if len(bccs) == 0 {
+		return ""
+	}
+	formatted := make([]string, 0, len(bccs))
+	for addr := range bccs {
+		formatted = append(formatted, (&mail.Address{Address: addr, Name: ""}).String())
+	}
+	return "Bcc: " + strings.Join(formatted, ",\r\n ") + "\r\n"
+}
+
 func sendMessage(config *oauth2.Config) {
 	tokenFile, err := os.Open(tokenPath())
 	if err != nil {
@@ -145,36 +197,15 @@ func sendMessage(config *oauth2.Config) {
 	if err != nil {
 		log.Fatalf("Failed to read message: %v.", err)
 	}
-	if err := smtp.SendMail("smtp.gmail.com:587", authWith(tokenSource), sender, flag.Args(), message); err != nil {
+	message = append([]byte(computeBCCHeader(message)), message...)
+	service, err := gmail.NewService(context.Background(), option.WithTokenSource(tokenSource))
+	if err != nil {
+		log.Fatalf("Failed to create Gmail client: %v.", err)
+	}
+	_, err = service.Users.Messages.Send(sender, &gmail.Message{Raw: base64.URLEncoding.EncodeToString(message)}).Do()
+	if err != nil {
 		log.Fatalf("Failed to send message: %v.", err)
 	}
-}
-
-func authWith(tokenSource oauth2.TokenSource) *auth {
-	return &auth{ts: tokenSource}
-}
-
-type auth struct {
-	ts oauth2.TokenSource
-}
-
-func (a *auth) Start(serverInfo *smtp.ServerInfo) (string, []byte, error) {
-	if !serverInfo.TLS {
-		return "", nil, fmt.Errorf("unencrypted connection: %v", serverInfo)
-	}
-	token, err := a.ts.Token()
-	if err != nil {
-		return "", nil, fmt.Errorf("failed to get token: %v", err)
-	}
-	toServer := fmt.Sprintf("user=%v\001auth=%v %v\001\001", sender, token.Type(), token.AccessToken)
-	return "XOAUTH2", []byte(toServer), nil
-}
-
-func (a *auth) Next(fromServer []byte, more bool) ([]byte, error) {
-	if more {
-		return nil, fmt.Errorf("unexpected challenge: %v", string(fromServer))
-	}
-	return nil, nil
 }
 
 func userConfigDir() string {
