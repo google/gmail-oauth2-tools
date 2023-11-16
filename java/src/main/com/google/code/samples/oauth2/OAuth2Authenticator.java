@@ -39,10 +39,10 @@ public class OAuth2Authenticator {
       Logger.getLogger(OAuth2Authenticator.class.getName());
 
   public static final class OAuth2Provider extends Provider {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 454502445710734267L;
 
     public OAuth2Provider() {
-      super("Google OAuth2 Provider", 1.0,
+      super("Google OAuth2 Provider", "1.0",
             "Provides the XOAUTH2 SASL Mechanism");
       put("SaslClientFactory.XOAUTH2",
           "com.google.code.samples.oauth2.OAuth2SaslClientFactory");
@@ -147,7 +147,7 @@ public class OAuth2Authenticator {
                                         email,
                                         oauthToken,
                                         true);
-    System.out.println("Successfully authenticated to IMAP.\n");
+    System.out.print("Successfully authenticated to IMAP.\n\n");
     SMTPTransport smtpTransport = connectToSmtp("smtp.gmail.com",
                                                 587,
                                                 email,
