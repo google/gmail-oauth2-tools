@@ -74,7 +74,7 @@ import ssl
 import sys
 import urllib.parse
 import urllib.request
-
+import os
 
 def SetupOptionParser():
   # Usage message is the module's docstring.
@@ -126,6 +126,11 @@ def SetupOptionParser():
                     dest='quiet',
                     help='Omit verbose descriptions and only print '
                          'machine-readable outputs.')
+  parser.add_option('--save_token',
+                    action='store_true',
+                    default=False,
+                    dest='save_token',
+                    help='persist token to disk (in current working directory)')
   return parser
 
 
@@ -313,6 +318,10 @@ def main(argv):
     RequireOptions(options, 'client_id', 'client_secret')
     response = RefreshToken(options.client_id, options.client_secret,
                             options.refresh_token)
+    if options.save_token:
+      rt_filepath = os.path.join(os.getcwd(), 'refreshed_token.json')
+      with open(rt_filepath, 'w') as outfile:
+        json.dump(response, outfile)
     if options.quiet:
       print(response['access_token'])
     else:
@@ -331,7 +340,11 @@ def main(argv):
     print('  %s' % GeneratePermissionUrl(options.client_id, options.scope))
     authorization_code = input('Enter verification code: ')
     response = AuthorizeTokens(options.client_id, options.client_secret,
-                                authorization_code)
+                            authorization_code)
+    if options.save_token:
+      rt_filepath = os.path.join(os.getcwd(), 'initial_token.json')
+      with open(rt_filepath, 'w') as outfile:
+        json.dump(response, outfile)
     print('Refresh Token: %s' % response['refresh_token'])
     print('Access Token: %s' % response['access_token'])
     print('Access Token Expiration Seconds: %s' % response['expires_in'])
