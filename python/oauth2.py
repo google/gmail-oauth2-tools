@@ -267,13 +267,12 @@ def GenerateOAuth2String(username, access_token, base64_encode=True):
   return auth_string
 
 
-def TestImapAuthentication(user, auth_string):
+def TestImapAuthentication(auth_string):
   """Authenticates to IMAP with the given auth_string.
 
   Prints a debug trace of the attempted IMAP connection.
 
   Args:
-    user: The Gmail username (full email address)
     auth_string: A valid OAuth2 string, as returned by GenerateOAuth2String.
         Must not be base64-encoded, since imaplib does its own base64-encoding.
   """
@@ -284,11 +283,10 @@ def TestImapAuthentication(user, auth_string):
   imap_conn.select('INBOX')
 
 
-def TestSmtpAuthentication(user, auth_string):
+def TestSmtpAuthentication(auth_string):
   """Authenticates to SMTP with the given auth_string.
 
   Args:
-    user: The Gmail username (full email address)
     auth_string: A valid OAuth2 string, not base64-encoded, as returned by
         GenerateOAuth2String.
   """
@@ -337,12 +335,12 @@ def main(argv):
     print('Access Token Expiration Seconds: %s' % response['expires_in'])
   elif options.test_imap_authentication:
     RequireOptions(options, 'user', 'access_token')
-    TestImapAuthentication(options.user,
+    TestImapAuthentication(
         GenerateOAuth2String(options.user, options.access_token,
                              base64_encode=False))
   elif options.test_smtp_authentication:
     RequireOptions(options, 'user', 'access_token')
-    TestSmtpAuthentication(options.user,
+    TestSmtpAuthentication(
         GenerateOAuth2String(options.user, options.access_token,
                              base64_encode=False))
   else:
