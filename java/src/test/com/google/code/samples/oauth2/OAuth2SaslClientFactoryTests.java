@@ -1,4 +1,4 @@
-package main.pro.freemania.code.samples.oauth2;
+package com.google.code.samples.oauth2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.Assume.assumeTrue;
@@ -7,11 +7,11 @@ import org.junit.jupiter.api.Test;
 
 import com.google.common.annotations.VisibleForTesting;
 
-import main.com.google.code.samples.oauth2.OAuth2SaslClientFactory;
+import com.google.code.samples.oauth2.OAuth2SaslClientFactory;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
-import main.com.google.code.samples.oauth2.OAuth2SaslClient;
+import com.google.code.samples.oauth2.OAuth2SaslClient;
 
 public class OAuth2SaslClientFactoryTests {
 
