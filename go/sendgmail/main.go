@@ -23,23 +23,21 @@ package main
 
 import (
 	"context"
-	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"io"
 	"log"
-	"net/smtp"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 
-	"github.com/google/uuid"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/authhandler"
 	googleOAuth2 "golang.org/x/oauth2/google"
+
+	"google.golang.org/api/gmail/v1"
+	"google.golang.org/api/option"
 )
 
 var (
@@ -47,13 +45,18 @@ var (
 	setUp  bool
 	dummyF string
 	dummyI bool
+	dryRun bool
+	scopes []string = []string{"https://www.googleapis.com/auth/gmail.send"}
 )
+
+const MIME_LINE = "\r\n"
 
 func init() {
 	flag.StringVar(&sender, "sender", "", "Specifies the sender's email address.")
 	flag.BoolVar(&setUp, "setup", false, "If true, sendgmail sets up the sender's OAuth2 token and then exits.")
 	flag.StringVar(&dummyF, "f", "", "Dummy flag for compatibility with sendmail.")
 	flag.BoolVar(&dummyI, "i", true, "Dummy flag for compatibility with sendmail.")
+	flag.BoolVar(&dryRun, "dry-run", false, "only print, do not send")
 }
 
 func main() {
@@ -68,7 +71,7 @@ func main() {
 	}
 	config := getConfig()
 	if setUp {
-		setUpToken(config)
+		setUpToken()
 		return
 	}
 	sendMessage(config)
@@ -90,31 +93,11 @@ func getConfig() *oauth2.Config {
 	return config
 }
 
-func setUpToken(config *oauth2.Config) {
-	state := uuid.NewString()
-	authHandler := func(authCodeURL string) (string, string, error) {
-		fmt.Println()
-		fmt.Println("1. Ensure that you are logged in as", sender, "in your browser.")
-		fmt.Println()
-		fmt.Println("2. Open the following link and authorise sendgmail:")
-		fmt.Println(authCodeURL + "&access_type=offline&prompt=consent") // hack to obtain a refresh token
-		fmt.Println()
-		fmt.Println("3. Enter the authorisation code:")
-		var code string
-		if _, err := fmt.Scan(&code); err != nil {
-			log.Fatalf("Failed to read authorisation code: %v.", err)
-		}
-		fmt.Println()
-		return code, state, nil
-	}
-	verifier := uuid.NewString()
-	s256 := sha256.Sum256([]byte(verifier))
-	challenge := base64.RawURLEncoding.EncodeToString(s256[:])
-	pkceParams := authhandler.PKCEParams{Challenge: challenge, ChallengeMethod: "S256", Verifier: verifier}
-	credentialsParams := googleOAuth2.CredentialsParams{Scopes: config.Scopes, State: state, AuthHandler: authHandler, PKCE: &pkceParams}
-	credentials, err := googleOAuth2.CredentialsFromJSONWithParams(context.Background(), configJSON(), credentialsParams)
+func setUpToken() {
+	aHandler := newCallbackHandler()
+	credentials, err := aHandler.getCredentials()
 	if err != nil {
-		log.Fatalf("Failed to obtain credentials: %v.", err)
+		log.Fatalf("Failed to exchange authorisation code for token: %v.", err)
 	}
 	token, err := credentials.TokenSource.Token()
 	if err != nil {
@@ -130,6 +113,38 @@ func setUpToken(config *oauth2.Config) {
 	}
 }
 
+type messageHeader struct {
+	to, cc, bcc []string
+}
+
+func parseArgs(args []string) (mh messageHeader) {
+	mh.to, mh.cc, mh.bcc = make([]string, 0), make([]string, 0), make([]string, 0)
+	for _, arg := range args {
+		parts := strings.Split(arg, ":")
+		switch parts[0] {
+		case "bcc":
+			mh.bcc = append(mh.bcc, parts[1])
+		case "cc":
+			mh.cc = append(mh.cc, parts[1])
+		default:
+			mh.to = append(mh.to, parts[0])
+		}
+	}
+	return
+}
+
+func (mh messageHeader) mimeHeader() string {
+	var header strings.Builder
+	header.WriteString("To: " + strings.Join(mh.to, ",") + MIME_LINE)
+	if len(mh.bcc) > 0 {
+		header.WriteString("Bcc: " + strings.Join(mh.bcc, ",") + MIME_LINE)
+	}
+	if len(mh.cc) > 0 {
+		header.WriteString("Cc: " + strings.Join(mh.cc, ",") + MIME_LINE)
+	}
+	return header.String()
+}
+
 func sendMessage(config *oauth2.Config) {
 	tokenFile, err := os.Open(tokenPath())
 	if err != nil {
@@ -140,41 +155,30 @@ func sendMessage(config *oauth2.Config) {
 	if err := json.NewDecoder(tokenFile).Decode(&token); err != nil {
 		log.Fatalf("Failed to read token: %v.", err)
 	}
-	tokenSource := config.TokenSource(context.Background(), &token)
+	ctx := context.Background()
+	tokenSource := config.TokenSource(ctx, &token)
+	srv, err := gmail.NewService(ctx, option.WithTokenSource(tokenSource))
+	if err != nil {
+		log.Fatalf("Unable to retrieve Gmail client: %v", err)
+	}
 	message, err := io.ReadAll(os.Stdin)
 	if err != nil {
-		log.Fatalf("Failed to read message: %v.", err)
+		log.Fatalf("unable to read stdin")
 	}
-	if err := smtp.SendMail("smtp.gmail.com:587", authWith(tokenSource), sender, flag.Args(), message); err != nil {
-		log.Fatalf("Failed to send message: %v.", err)
+	header := parseArgs(flag.Args())
+	headerByte := []byte(header.mimeHeader())
+	fullMessage := append(headerByte[:], message[:]...)
+
+	gmsg := &gmail.Message{
+		Raw: base64.URLEncoding.EncodeToString(fullMessage),
 	}
-}
-
-func authWith(tokenSource oauth2.TokenSource) *auth {
-	return &auth{ts: tokenSource}
-}
-
-type auth struct {
-	ts oauth2.TokenSource
-}
-
-func (a *auth) Start(serverInfo *smtp.ServerInfo) (string, []byte, error) {
-	if !serverInfo.TLS {
-		return "", nil, fmt.Errorf("unencrypted connection: %v", serverInfo)
+	if dryRun {
+		return
 	}
-	token, err := a.ts.Token()
+	_, err = srv.Users.Messages.Send("me", gmsg).Do()
 	if err != nil {
-		return "", nil, fmt.Errorf("failed to get token: %v", err)
+		log.Fatalf("Unable to send email: %v", err)
 	}
-	toServer := fmt.Sprintf("user=%v\001auth=%v %v\001\001", sender, token.Type(), token.AccessToken)
-	return "XOAUTH2", []byte(toServer), nil
-}
-
-func (a *auth) Next(fromServer []byte, more bool) ([]byte, error) {
-	if more {
-		return nil, fmt.Errorf("unexpected challenge: %v", string(fromServer))
-	}
-	return nil, nil
 }
 
 func userConfigDir() string {
