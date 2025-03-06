@@ -22,7 +22,8 @@ See https://developers.google.com/identity/protocols/OAuth2 for instructions on
 registering and for documentation of the APIs invoked by this code.
 
 NOTE: The OAuth2 OOB flow isn't a thing anymore. You will need to set the
-application type to "Web application" and then add https://oauth2.dance/ as an
+application type to "Web application" and then add
+https://google.github.io/gmail-oauth2-tools/html/oauth2.dance.html as an
 authorised redirect URI. This is necessary for seeing the authorisation code on
 a page in your browser.
 
@@ -134,7 +135,7 @@ GOOGLE_ACCOUNTS_BASE_URL = 'https://accounts.google.com'
 
 
 # Hardcoded redirect URI.
-REDIRECT_URI = 'https://oauth2.dance/'
+REDIRECT_URI = 'https://google.github.io/gmail-oauth2-tools/html/oauth2.dance.html'
 
 
 def AccountsUrl(command):

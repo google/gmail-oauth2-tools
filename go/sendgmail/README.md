@@ -22,8 +22,9 @@ send-email`.
     *   Follow the steps in the **Authorize credentials for a desktop
         application** section. However, set the application type to *Web
         application* (i.e. instead of *Desktop app*) and then add
-        `https://oauth2.dance/` as an authorised redirect URI. This is necessary
-        for seeing the authorisation code on a page in your browser.
+        `https://google.github.io/gmail-oauth2-tools/html/oauth2.dance.html`
+        as an authorised redirect URI. This is necessary for seeing the
+        authorisation code on a page in your browser.
 
     *   When you download the credentials as JSON, create the
         `${XDG_CONFIG_HOME:-${HOME}/.config}/sendgmail` directory with file mode
