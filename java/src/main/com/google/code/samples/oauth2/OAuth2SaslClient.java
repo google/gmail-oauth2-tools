@@ -16,16 +16,16 @@
 package com.google.code.samples.oauth2;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.sasl.SaslClient;
 import javax.security.sasl.SaslException;
+
+import org.apache.maven.surefire.shared.lang3.NotImplementedException;
 
 
 /**
@@ -39,7 +39,8 @@ class OAuth2SaslClient implements SaslClient {
   private final CallbackHandler callbackHandler;
 
   private boolean isComplete = false;
-
+  private String MechanismName = "XOAUTH2";
+  private String Email;
   /**
    * Creates a new instance of the OAuth2SaslClient. This will ordinarily only
    * be called from OAuth2SaslClientFactory.
@@ -50,8 +51,14 @@ class OAuth2SaslClient implements SaslClient {
     this.callbackHandler = callbackHandler;
   }
 
+  public OAuth2SaslClient()
+  {
+    this.oauthToken = null;
+    this.callbackHandler = null;
+  }
+
   public String getMechanismName() {
-    return "XOAUTH2";
+    return this.MechanismName;
   }
 
   public boolean hasInitialResponse() {
@@ -73,12 +80,12 @@ class OAuth2SaslClient implements SaslClient {
     } catch (IOException e) {
       throw new SaslException("Failed to execute callback: " + e);
     }
-    String email = nameCallback.getName();
+    this.Email = nameCallback.getName();
 
-    byte[] response = String.format("user=%s\1auth=Bearer %s\1\1", email,
+    byte[] postToAppendToServerAddress = String.format("user=%s\1auth=Bearer %s\1\1", this.Email,
                                     oauthToken).getBytes();
     isComplete = true;
-    return response;
+    return postToAppendToServerAddress;
   }
 
   public boolean isComplete() {
@@ -87,19 +94,43 @@ class OAuth2SaslClient implements SaslClient {
 
   public byte[] unwrap(byte[] incoming, int offset, int len)
       throws SaslException {
-    throw new IllegalStateException();
+    throw new NotImplementedException();
   }
 
   public byte[] wrap(byte[] outgoing, int offset, int len)
       throws SaslException {
-    throw new IllegalStateException();
+    throw new NotImplementedException();
   }
 
   public Object getNegotiatedProperty(String propName) {
     if (!isComplete()) {
       throw new IllegalStateException();
     }
-    return null;
+    switch(propName)
+    {
+      case "Email":
+        if(this.Email == null)
+          return null;
+        else
+          return this.Email;
+      case "MechanismName":
+        if(this.MechanismName == null)
+          return null;
+        else
+          return this.getMechanismName();
+      case "OAuthToken":
+        if(null == this.oauthToken)
+          return null;
+        else
+          return this.oauthToken;
+      case "CallbackHandler":
+        if(this.callbackHandler == null)
+          return null;
+        else
+          return this.callbackHandler;
+      default:
+        return null;
+    }
   }
 
   public void dispose() throws SaslException {

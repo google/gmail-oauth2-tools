@@ -56,7 +56,7 @@ public class OAuth2SaslClientFactory implements SaslClientFactory {
     return new OAuth2SaslClient((String) props.get(OAUTH_TOKEN_PROP),
                                 callbackHandler);
   }
-
+  
   public String[] getMechanismNames(Map<String, ?> props) {
     return new String[] {"XOAUTH2"};
   }
