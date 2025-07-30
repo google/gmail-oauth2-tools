@@ -38,11 +38,8 @@ send-email`.
 3.  Go back to **APIs & Services > OAuth consent screen** in the Google Cloud
     console.
 
-    *   Add `USERNAME@gmail.com` as a test user. This is necessary for using the
-        project that you created.
-
-    *   Add `https://mail.google.com/` as a scope. This is necessary for using
-        Gmail via SMTP.
+    *   Add `https://mail.google.com/` as a scope under **Data Access**.
+        This is necessary for using GMail via SMTP.
 
 ## Installing sendgmail
 
