@@ -1,3 +1,5 @@
+[![gmail-oauth2-tools](https://github.com/FreedomFaighter/gmail-oauth2-tools/actions/workflows/build-jar.yml/badge.svg)](https://github.com/FreedomFaighter/gmail-oauth2-tools/actions/workflows/build-jar.yml)
+
 Tools and sample code for authenticating to Gmail with OAuth2.
 
 The specification is available [here](https://developers.google.com/gmail/xoauth2_protocol).
