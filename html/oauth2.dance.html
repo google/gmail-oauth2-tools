@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root { color-scheme: dark light; }</style>
+<title>oauth2.dance</title>
+<h1>oauth2.dance</h1>
+<div id="authCodeDivFailure" style="display: none;">
+  These aren't the droids you're looking for.
+</div>
+<div id="authCodeDivSuccess" style="display: none;">
+  Authorisation Code:
+  <span id="authCodeSpan" style="font-family: monospace; font-weight: bold;"></span>
+  <br>
+  <button id="authCodeButton">Copy To Clipboard</button>
+</div>
+<script>
+  var searchParams = new URLSearchParams(window.location.search);
+  var code = searchParams.get("code");
+  if (code === null) {
+    var div = document.getElementById("authCodeDivFailure");
+    div.style = "";
+  } else {
+    var button = document.getElementById("authCodeButton");
+    button.addEventListener("click", (e) => { navigator.clipboard.writeText(code); });
+    var span = document.getElementById("authCodeSpan");
+    span.textContent = code;
+    var div = document.getElementById("authCodeDivSuccess");
+    div.style = "";
+  }
+</script>
